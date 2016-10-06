@@ -13,12 +13,19 @@
 
 struct cell
 {
-    char visual[4];
-    char logic[2];
+    char state[4];
     cell();
     void H();
     void V();
     void S();
+};
+
+struct Digger
+{
+    int dir;
+    int desiredDir;
+    SDL_Rect hitBox;
+    Digger(int x, int y);
 };
 
 class GameScene: public Scene {
@@ -37,11 +44,7 @@ private:
     SDL_Rect _levelSize;
     
     SDL_Rect _renderWindow;
-    int _dx, _dy;
-    int _dh, _dv;
-    int _offset;
-    int _digDir;
-    int _desiredDir;
+
     
     void initLevel(int level);
     
@@ -54,6 +57,7 @@ private:
     
     
     float _digTick;
+    std::vector<Digger> _players;
 };
 
 #endif	/* GAMESCENE_H */

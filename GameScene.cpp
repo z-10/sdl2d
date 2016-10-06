@@ -110,30 +110,27 @@ char leveldat[8][10][15]=
   }
 };
 
-char masks[7] = {0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20};
+const char masks[7] = {0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20};
+const char turningPoints[4] = {0,4,0,5};
  
 cell::cell()
 {
-    visual[0] = 0;
-    visual[1] = 0;
-    visual[2] = 0;
-    visual[3] = 0;
-    logic[0] = 0;
-    logic[1] = 0;
+    state[Direction::DIG_LEFT] = 0;
+    state[Direction::DIG_RIGHT] = 0;
+    state[Direction::DIG_UP] = 0;
+    state[Direction::DIG_DOWN] = 0;
 }
 
 void cell::H()
 {
-    logic[Direction::DIG_RIGHT] = 31;
-    visual[Direction::DIG_LEFT] = 31;
-    visual[Direction::DIG_RIGHT] = 31;
+    state[Direction::DIG_LEFT] = 31;
+    state[Direction::DIG_RIGHT] = 31;
 }
 
 void cell::V()
 {
-    logic[Direction::DIG_UP] = 63;
-    visual[Direction::DIG_UP] = 63;
-    visual[Direction::DIG_DOWN] = 63;
+    state[Direction::DIG_UP] = 63;
+    state[Direction::DIG_DOWN] = 63;
     
 }
 
@@ -141,6 +138,17 @@ void cell::S()
 {
     H();
     V();
+}
+
+Digger::Digger(int x, int y)
+{
+    dir = Direction::DIG_NONE;
+    desiredDir = Direction::DIG_NONE;
+    
+    hitBox.x = x;
+    hitBox.y = y;
+    hitBox.w = 5;
+    hitBox.h = 6;
 }
 
 void GameScene::initLevel(int level)
@@ -158,13 +166,11 @@ void GameScene::initLevel(int level)
                     c.H();
                     if(i < 9 && leveldat[level][i+1][j] == 'V')
                     {
-                        c.visual[Direction::DIG_DOWN] |= 32;
-                        c.logic[Direction::DIG_UP] |= 32;
+                        c.state[Direction::DIG_DOWN] |= 32;
                     }
                     if(i > 0 && leveldat[level][i-1][j] == 'V')
                     {
-                        c.visual[Direction::DIG_UP] |= 32;
-                        c.logic[Direction::DIG_UP] |= 1;
+                        c.state[Direction::DIG_UP] |= 32;
                     }
                 break;
                 case 'V':
@@ -179,12 +185,8 @@ void GameScene::initLevel(int level)
     }
     _levelSize.w = 15;
     _levelSize.h = 10;
-    _dx = 8*5;
-    _dy = 8 * 6;
-    _dh = 8;
-    _dv = 9;
-    _digDir = Direction::DIG_RIGHT;
-    _desiredDir = Direction::DIG_NONE;
+  
+    _players.push_back(Digger(30,54));
     _digTick = 0.0f;
 }
 
@@ -203,82 +205,86 @@ void GameScene::enter()
 
 void GameScene::update(float dt)
 {
+    
+      
     _digTick += dt;
     if(_digTick > SPEED)
     {
         _digTick -= SPEED;
-        _desiredDir = Direction::DIG_NONE;
-        if(Input::instance()->isPressed(0, Controls::CT_LEFT))
+        for(int i = 0; i < _players.size(); ++i)
         {
-            _desiredDir = Direction::DIG_LEFT;
-        }
-        if(Input::instance()->isPressed(0, Controls::CT_RIGHT))
-        {
-            _desiredDir = Direction::DIG_RIGHT;
-        }
-        if(Input::instance()->isPressed(0, Controls::CT_UP))
-        {
-            _desiredDir = Direction::DIG_UP;
-        }
-        if(Input::instance()->isPressed(0, Controls::CT_DOWN))
-        {
-            _desiredDir = Direction::DIG_DOWN;
-        }
+            _players[i].desiredDir = Direction::DIG_NONE;
+            if(Input::instance()->isPressed(i, Controls::CT_LEFT))
+            {
+                _players[i].desiredDir = Direction::DIG_LEFT;
+            }
+            if(Input::instance()->isPressed(i, Controls::CT_RIGHT))
+            {
+                _players[i].desiredDir = Direction::DIG_RIGHT;
+            }
+            if(Input::instance()->isPressed(i, Controls::CT_UP))
+            {
+                _players[i].desiredDir = Direction::DIG_UP;
+            }
+            if(Input::instance()->isPressed(i, Controls::CT_DOWN))
+            {
+                _players[i].desiredDir = Direction::DIG_DOWN;
+            }
+
+            if(_players[i].desiredDir != Direction::DIG_NONE)
+            {
+                if(_players[i].dir == Direction::DIG_NONE)
+                {
+                    _players[i].dir = _players[i].desiredDir;
+                }
+                else
+                {
+                    if(_players[i].desiredDir == Direction::DIG_LEFT || _players[i].desiredDir == Direction::DIG_RIGHT)
+                    {
+                        if(_players[i].dir == Direction::DIG_LEFT || _players[i].dir == Direction::DIG_RIGHT || (_players[i].hitBox.y % 6) == 0)
+                        {
+                            _players[i].dir = _players[i].desiredDir;
+                        }
+                    }
+                    if(_players[i].desiredDir == Direction::DIG_UP || _players[i].desiredDir == Direction::DIG_DOWN)
+                    {
+                        if(_players[i].dir == Direction::DIG_UP || _players[i].dir == Direction::DIG_DOWN || (_players[i].hitBox.x % 5) == 0)
+                        {
+                            _players[i].dir = _players[i].desiredDir;
+                        }
+                    }
+                }
+                printf("DIR : %d DESIRED %d X %d Y %d XR %d YR %d\n", _players[i].dir, _players[i].desiredDir, _players[i].hitBox.x , _players[i].hitBox.y , _players[i].hitBox.x % 5, _players[i].hitBox.y % 6);
+                if(_players[i].dir == Direction::DIG_LEFT && _players[i].hitBox.x > 0)
+                {
+                    _players[i].hitBox.x -= 1;
+                    int x = _players[i].hitBox.x / 5;
+                    int y = _players[i].hitBox.y / 6;
+                    int index = 5 - (_players[i].hitBox.x % 5) + 1;
+                    _levelData[y][x].state[Direction::DIG_LEFT] |= masks[index]; 
+                }
+                if(_players[i].dir == Direction::DIG_RIGHT && _players[i].hitBox.x < (_levelSize.w - 1) * 5)
+                {
+                    _players[i].hitBox.x += 1;
+                    int x = (_players[i].hitBox.x + 5) / 5;
+                    int y = _players[i].hitBox.y / 6;
+                    int index = _players[i].hitBox.x % 5 + 1;
+                    _levelData[y][x].state[Direction::DIG_RIGHT] |= masks[index]; 
+                }
+                if(_players[i].dir == Direction::DIG_UP && _players[i].hitBox.y > 0)
+                {
+                    _players[i].hitBox.y -= 1;
+                    int x = _players[i].hitBox.x / 5;
+                    int y = _players[i].hitBox.y / 6;
+                    int index = 6 - (_players[i].hitBox.x % 6);
+                    _levelData[y][x].state[Direction::DIG_UP] |= masks[index]; 
+                }
+                if(_players[i].dir == Direction::DIG_DOWN && _players[i].hitBox.y < (_levelSize.h - 1) * 6)
+                {
+                    _players[i].hitBox.y += 1;
+                }
+            }
         
-        if(_desiredDir != Direction::DIG_NONE)
-        {
-            if(_desiredDir == Direction::DIG_LEFT || _desiredDir == Direction::DIG_RIGHT)
-            {
-                if(_digDir == Direction::DIG_LEFT || _digDir == Direction::DIG_RIGHT)
-                {
-                    _digDir = _desiredDir;
-                }
-                else
-                {
-                    int y = _dy / 6;
-                    int rem = _dy % 6;
-                    if(rem == 0)
-                    {
-                        _dv = y;
-                        _digDir = _desiredDir;
-                    }
-                }
-            }
-            if(_desiredDir == Direction::DIG_UP || _desiredDir == Direction::DIG_DOWN)
-            {
-                if(_digDir == Direction::DIG_UP || _digDir == Direction::DIG_DOWN)
-                {
-                    _digDir = _desiredDir;
-                }
-                else
-                {
-                    int x = _dx / 5;
-                    int rem = _dx % 5;
-                    if(rem == 0)
-                    {
-                        _dh = x;
-                        _digDir = _desiredDir;
-                    }
-                }
-            }        
-            
-            if(_digDir == Direction::DIG_LEFT)
-            {
-                _dx--;
-            }
-            if(_digDir == Direction::DIG_RIGHT)
-            {
-                _dx++;
-            }
-            if(_digDir == Direction::DIG_UP)
-            {
-                _dy--;
-            }
-            if(_digDir == Direction::DIG_DOWN)
-            {
-                _dx++;
-            }
-            printf("DH : %d, DV : %d, DX : %d, DY : %d\n", _dh, _dv, _dx, _dy);
         }
         
         
@@ -295,7 +301,7 @@ void GameScene::renderLeft(SDL_Renderer* renderer)
     {
         for(int x = _levelSize.w - 1; x > -1; x--)
         {
-            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_LEFT, _levelData[y][x].visual[Direction::DIG_LEFT], renderer);
+            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_LEFT, _levelData[y][x].state[Direction::DIG_LEFT], renderer);
             r.x = 24 + x * 40 - 8;
             r.y = 36 + y * 36 - 6;
             SDL_RenderCopy(renderer, tex1, NULL, &r);
@@ -312,7 +318,7 @@ void GameScene::renderRight(SDL_Renderer* renderer)
     {
         for(int x = 0; x < _levelSize.w; x++)
         {
-            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_RIGHT, _levelData[y][x].visual[Direction::DIG_RIGHT], renderer);
+            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_RIGHT, _levelData[y][x].state[Direction::DIG_RIGHT], renderer);
             r.x = 24 + x * 40 - 8;
             r.y = 36 + y * 36 - 6;
             SDL_RenderCopy(renderer, tex1, NULL, &r);
@@ -329,7 +335,7 @@ void GameScene::renderDown(SDL_Renderer* renderer)
     {
         for(int x = 0; x < _levelSize.w; x++)
         {
-            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_DOWN, _levelData[y][x].visual[Direction::DIG_DOWN], renderer);
+            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_DOWN, _levelData[y][x].state[Direction::DIG_DOWN], renderer);
             r.x = 24 + x * 40 - 8;
             r.y = 36 + y * 36 - 6;
             SDL_RenderCopy(renderer, tex1, NULL, &r);
@@ -346,7 +352,7 @@ void GameScene::renderUp(SDL_Renderer* renderer)
     {
         for(int x = 0; x < _levelSize.w; x++)
         {
-            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_UP, _levelData[y][x].visual[Direction::DIG_UP], renderer);
+            SDL_Texture* tex1 = ResourceManager::instance()->getBlob(Direction::DIG_UP, _levelData[y][x].state[Direction::DIG_UP], renderer);
             r.x = 24 + x * 40 - 8;
             r.y = 36 + y * 36 - 6;
             SDL_RenderCopy(renderer, tex1, NULL, &r);
@@ -358,21 +364,14 @@ void GameScene::renderDigger(SDL_Renderer* renderer)
 {
    SDL_Texture* tex1 = ResourceManager::instance()->getDigger(0, Direction::DIG_UP, 0, renderer);
    SDL_Rect r;
-   
-   if(_digDir == Direction::DIG_RIGHT || _digDir == Direction::DIG_LEFT)
-   {
-        r.x = _dx * 8 + 24 - 32;
-        r.y = _dv * 36 + 36 + 3;
+   for(int i = 0; i < _players.size(); ++i)
+   {  
+        r.x = _players[i].hitBox.x * 8 + 24 + 4;
+        r.y = _players[i].hitBox.y * 6 + 36 + 3;
+        r.w = 32;
+        r.h = 30;
+        SDL_RenderCopy(renderer, tex1, NULL, &r);    
    }
-   if(_digDir == Direction::DIG_UP || _digDir == Direction::DIG_DOWN)
-   {
-        r.x = _dh * 40 + 24 + 4;
-        r.y = _dy * 6 + 36 + 3;
-   }
-   
-   r.w = 32;
-   r.h = 30;
-   SDL_RenderCopy(renderer, tex1, NULL, &r);
 }
 
 void GameScene::render(SDL_Renderer* renderer)
