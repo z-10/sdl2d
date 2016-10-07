@@ -5,7 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>Application.h</itemPath>
-      <itemPath>DebugScene.h</itemPath>
+      <itemPath>GameField.h</itemPath>
       <itemPath>GameScene.h</itemPath>
       <itemPath>Input.h</itemPath>
       <itemPath>ResourceManager.h</itemPath>
@@ -21,7 +21,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>Application.cpp</itemPath>
-      <itemPath>DebugScene.cpp</itemPath>
+      <itemPath>GameField.cpp</itemPath>
       <itemPath>GameScene.cpp</itemPath>
       <itemPath>Input.cpp</itemPath>
       <itemPath>ResourceManager.cpp</itemPath>
@@ -55,6 +55,7 @@
           </incDir>
         </cTool>
         <ccTool>
+          <standard>8</standard>
           <incDir>
             <pElem>/usr/local/include/SDL2</pElem>
           </incDir>
@@ -70,9 +71,9 @@
       </item>
       <item path="Application.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="DebugScene.cpp" ex="false" tool="1" flavor2="0">
+      <item path="GameField.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="DebugScene.h" ex="false" tool="3" flavor2="0">
+      <item path="GameField.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="GameScene.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -121,9 +122,9 @@
       </item>
       <item path="Application.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="DebugScene.cpp" ex="false" tool="1" flavor2="0">
+      <item path="GameField.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="DebugScene.h" ex="false" tool="3" flavor2="0">
+      <item path="GameField.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="GameScene.cpp" ex="false" tool="1" flavor2="0">
       </item>

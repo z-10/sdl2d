@@ -29,13 +29,31 @@ ResourceManager* ResourceManager::instance()
     return _instance;
 }
 
-SDL_Texture* ResourceManager::getBlob(Direction dir, char mask, SDL_Renderer* render)
+SDL_Texture* ResourceManager::getBlob(Direction dir, SDL_Renderer* render)
 {
-    SDL_Texture* blob = _blobs[dir][mask];
+    SDL_Texture* blob = _blobs[dir];
     if(!blob)
     {
-        blob = buildBlob(dir, mask, render);
-        _blobs[dir][mask] = blob;
+        SDL_Surface* surface;
+        switch(dir)
+        {
+            case Direction::DIG_UP:
+                surface = IMG_Load("data/up.png");
+                break;
+            case Direction::DIG_DOWN:
+                surface = IMG_Load("data/down.png");
+                break;
+            case Direction::DIG_LEFT:
+                surface = IMG_Load("data/left.png");
+                break;
+            case Direction::DIG_RIGHT:
+                surface = IMG_Load("data/right.png");
+                break;
+                
+        }
+        blob = SDL_CreateTextureFromSurface(render, surface);
+        SDL_FreeSurface(surface);
+        _blobs[dir] = blob;
     }
     return blob;
     
@@ -145,10 +163,8 @@ ResourceManager::ResourceManager()
 {
     for(int i = 0; i < 4; ++i)
     {
-        for(int j= 0; j < 0xFF; ++j)
-        {
-            _blobs[i][j] = NULL;
-        }
+        _blobs[i] = NULL;
+
     }
     for(int player = 0; player < CONTROL_MAX_PLAYERS; ++player)
     {
@@ -184,13 +200,10 @@ ResourceManager::~ResourceManager()
 {
     for(int i = 0; i < 4; ++i)
     {
-        for(int j= 0; j < 0xFF; ++j)
+        if(_blobs[i])
         {
-            if(_blobs[i][j])
-            {
-                SDL_DestroyTexture(_blobs[i][j]);
-                _blobs[i][j] = NULL;
-            }
+            SDL_DestroyTexture(_blobs[i]);
+            _blobs[i] = NULL;
         }
     }
     

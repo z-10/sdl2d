@@ -36,7 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Application.o \
-	${OBJECTDIR}/DebugScene.o \
+	${OBJECTDIR}/GameField.o \
 	${OBJECTDIR}/GameScene.o \
 	${OBJECTDIR}/Input.o \
 	${OBJECTDIR}/ResourceManager.o \
@@ -71,37 +71,37 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/sdl2d: ${OBJECTFILES}
 ${OBJECTDIR}/Application.o: Application.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Application.o Application.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Application.o Application.cpp
 
-${OBJECTDIR}/DebugScene.o: DebugScene.cpp 
+${OBJECTDIR}/GameField.o: GameField.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/DebugScene.o DebugScene.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GameField.o GameField.cpp
 
 ${OBJECTDIR}/GameScene.o: GameScene.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GameScene.o GameScene.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GameScene.o GameScene.cpp
 
 ${OBJECTDIR}/Input.o: Input.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Input.o Input.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Input.o Input.cpp
 
 ${OBJECTDIR}/ResourceManager.o: ResourceManager.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ResourceManager.o ResourceManager.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ResourceManager.o ResourceManager.cpp
 
 ${OBJECTDIR}/Scene.o: Scene.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scene.o Scene.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scene.o Scene.cpp
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -I/usr/local/include/SDL2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

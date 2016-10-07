@@ -36,7 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Application.o \
-	${OBJECTDIR}/DebugScene.o \
+	${OBJECTDIR}/GameField.o \
 	${OBJECTDIR}/GameScene.o \
 	${OBJECTDIR}/Input.o \
 	${OBJECTDIR}/ResourceManager.o \
@@ -73,10 +73,10 @@ ${OBJECTDIR}/Application.o: Application.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Application.o Application.cpp
 
-${OBJECTDIR}/DebugScene.o: DebugScene.cpp 
+${OBJECTDIR}/GameField.o: GameField.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/DebugScene.o DebugScene.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GameField.o GameField.cpp
 
 ${OBJECTDIR}/GameScene.o: GameScene.cpp 
 	${MKDIR} -p ${OBJECTDIR}

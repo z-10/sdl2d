@@ -8,17 +8,9 @@
 #ifndef GAMESCENE_H
 #define	GAMESCENE_H
 #include "Scene.h"
+#include "GameField.h"
 
 #include <vector>
-
-struct cell
-{
-    char state[4];
-    cell();
-    void H();
-    void V();
-    void S();
-};
 
 struct Digger
 {
@@ -26,6 +18,7 @@ struct Digger
     int desiredDir;
     SDL_Rect hitBox;
     Digger(int x, int y);
+    void debug();
 };
 
 class GameScene: public Scene {
@@ -40,11 +33,7 @@ public:
     
 private:
 
-    std::vector<std::vector<cell> > _levelData;
-    SDL_Rect _levelSize;
-    
-    SDL_Rect _renderWindow;
-
+    GameField _gameField;
     
     void initLevel(int level);
     
